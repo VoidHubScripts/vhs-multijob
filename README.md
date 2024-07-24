@@ -27,4 +27,4 @@ Usage
 
 
 Support: https://discord.gg/CBSSMpmqrK
-Video: 
+Video: https://youtu.be/eKHfupdI67o
