@@ -1,48 +1,28 @@
-local function capitalizeFirstLetter(str)
+local function caps(str)
   return (str:gsub("^%l", string.upper))
 end
 
-local function formatJobData(jobList)
-  local formattedJobs = {}
-  
+local function format(jobList)
+  local reactData = {}
   for _, job in ipairs(jobList) do
-      local formattedName = capitalizeFirstLetter(job.name)
-      local formattedJob = string.format("%s - %s", formattedName, job.label)
-      table.insert(formattedJobs, {
-          name = job.name,  
-          grade = job.grade,
-          label = formattedJob
-      })
+      local Job = string.format("%s - %s", caps(job.name), job.label)
+      table.insert(reactData, { name = job.name, grade = job.grade, label = Job })
   end
-  
-  return formattedJobs
+  return reactData
 end
 
-local function openFob()
+local function openJobs()
   SetNuiFocus(true, true)
-  SendNUIMessage({
-      action = "OPEN",
-  })
-
+  SendNUIMessage({ action = "OPEN" })
   local JobList = lib.callback.await('vhs-multijob:getJobs', false)
-  
   if JobList then
-      local formattedJobList = formatJobData(JobList)
-      
-      -- Debugging line
-      print("Sending job data: " .. json.encode(formattedJobList))
-      
-      SendNUIMessage({
-          action = "UPDATE_STATS",
-          module = "jobs",
-          data = formattedJobList
-      })
+      local jobs = format(JobList)
+      SendNUIMessage({ action = "UPDATE_STATS", module = "jobs", data = jobs })
   else
-      print("Failed to fetch jobs.")
   end
 end
 
-closeFob = function()
+closeJobs = function()
   SetNuiFocus(false, false)
   SendNUIMessage({
       event = "UI_STATE",
@@ -50,32 +30,17 @@ closeFob = function()
   })
 end
 
-
-SendNUIMessage({
-  event = "UI_STATE",
-  skills = data,
-})
-
+RegisterCommand("toggleFob", function()
+  if isUIOpen then
+    closeJobs()
+  else
+    openJobs()
+  end
+end, false)
 
 RegisterNUICallback('LOSE_FOCUS', function(data, cb)
   SetNuiFocus(false, false)
   cb('ok')
 end)
 
-RegisterCommand("toggleFob", function()
-  if isUIOpen then
-      closeFob()
-  else
-      openFob()
-  end
-end, false)
-
-
-
-
-
 RegisterKeyMapping("toggleFob", "Toggle Fob", "keyboard", menuOptions.openUI)
-
-RegisterCommand("closefob", function(source, args, rawCommand)
-  closeFob()
-end, false)

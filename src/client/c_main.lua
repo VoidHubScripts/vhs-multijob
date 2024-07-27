@@ -1,26 +1,15 @@
 if Framework == 'esx' then ESX = exports["es_extended"]:getSharedObject() else QBCore = exports['qb-core']:GetCoreObject() end
 
-AddEventHandler('onResourceStart', function(resource)
-    if resource == GetCurrentResourceName() then
-        TriggerServerEvent('vhs-gym:checkStats')
-    end
- end)
 
 if Framework == 'esx' then
     RegisterNetEvent('esx:playerLoaded')
     AddEventHandler('esx:playerLoaded', function(xPlayer, isNew, skin)
         ESX.PlayerData = xPlayer
-        TriggerServerEvent('vhs-gym:checkStats')
     end)
     RegisterNetEvent('esx:setJob')
     AddEventHandler('esx:setJob', function(job)
         ESX.PlayerData.job = job
         local success = lib.callback.await('vhs-multijob:updateJobs', false, job.name, job.grade, job.grade_label)
-        if success then
-            print("Job updated successfully.")
-        else
-            print("Failed to update job.")
-        end
     end)
 end
 
@@ -31,31 +20,14 @@ if Framework == 'qbcore' then
         PlayerData = QBCore.Functions.GetPlayerData()
     end)
     RegisterNetEvent('QBCore:Client:OnJobUpdate', function(JobInfo)
-        PlayerData.job = JobInfo
-        local success = lib.callback.await('vhs-multijob:updateJobs', false, JobInfo.name, JobInfo.grade.level, JobInfo.grade.name)
-        if success then
-            print("Job updated successfully.")
-        else
-            print("Failed to update job.")
-        end
+        local setjob = lib.callback.await('vhs-multijob:updateJobs', false, JobInfo.name, JobInfo.grade.level, JobInfo.grade.name)
     end)
 end
 
-
-
-
 RegisterNUICallback('setjob', function(data, cb)
-    print('setjob lua ', json.encode(data))
     local setjob = lib.callback.await('vhs-multijob:setJob', false, data.jobName, data.jobGrade)
 end)
 
 RegisterNUICallback('deleteJob', function(data, cb)
-    print('deleteJob lua', json.encode(data))
-    local success = lib.callback.await('vhs-multijob:removeJob', false, data.jobName)
-    
-    if success then
-        cb('ok')
-    else
-        cb('error')
-    end
+    local deletejob = lib.callback.await('vhs-multijob:removeJob', false, data.jobName)
 end)

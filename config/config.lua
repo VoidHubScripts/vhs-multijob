@@ -1,19 +1,17 @@
 
 Config = Config or {}
 
-Framework = 'esx' -- esx, qbcore 
+Framework = 'qbcore' -- esx, qbcore 
 Notifications = 'ox_lib'  -- qbcore, esx, ox_lib
-Progress = 'ox_lib_circle' -- ox_lib_circle, ox_lib_bar, qbcore
-InventoryImagePath = "nui://ox_inventory/web/images/"
-
 
 menuOptions = { 
   openUI = 'O', 
-  maxJobs = 3
+  maxJobs = 3,  --[[ Max amount of jobs a player can have in the job menu at a time ]] 
 }
 
 allowedJobs = {
   ["police"] = true,
   ["ambulance"] = true,
   ["taxi"] = true,
+  -- add more if needed 
 }
