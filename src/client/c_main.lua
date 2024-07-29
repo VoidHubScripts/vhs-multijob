@@ -1,6 +1,5 @@
 if Framework == 'esx' then ESX = exports["es_extended"]:getSharedObject() else QBCore = exports['qb-core']:GetCoreObject() end
 
-
 if Framework == 'esx' then
     RegisterNetEvent('esx:playerLoaded')
     AddEventHandler('esx:playerLoaded', function(xPlayer, isNew, skin)
@@ -20,7 +19,9 @@ if Framework == 'qbcore' then
         PlayerData = QBCore.Functions.GetPlayerData()
     end)
     RegisterNetEvent('QBCore:Client:OnJobUpdate', function(JobInfo)
-        local setjob = lib.callback.await('vhs-multijob:updateJobs', false, JobInfo.name, JobInfo.grade.level, JobInfo.grade.name)
+        PlayerData.job = JobInfo
+        local success = lib.callback.await('vhs-multijob:updateJobs', false, JobInfo.name, JobInfo.grade.level, JobInfo.grade.name)
+        end
     end)
 end
 
@@ -29,5 +30,5 @@ RegisterNUICallback('setjob', function(data, cb)
 end)
 
 RegisterNUICallback('deleteJob', function(data, cb)
-    local deletejob = lib.callback.await('vhs-multijob:removeJob', false, data.jobName)
+    local success = lib.callback.await('vhs-multijob:removeJob', false, data.jobName)
 end)

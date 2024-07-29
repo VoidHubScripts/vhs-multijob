@@ -2,45 +2,51 @@ local function caps(str)
   return (str:gsub("^%l", string.upper))
 end
 
-local function format(jobList)
-  local reactData = {}
+local function fJob(jobList)
+  local fJobs = {}
+  
   for _, job in ipairs(jobList) do
-      local Job = string.format("%s - %s", caps(job.name), job.label)
-      table.insert(reactData, { name = job.name, grade = job.grade, label = Job })
+      local jName = caps(job.name)
+      local fJobs = string.format("%s - %s", jName, job.label)
+      table.insert(fJobs, { name = job.name, grade = job.grade, label = jName })
   end
-  return reactData
+  
+  return fJobs
 end
 
-local function openJobs()
+local function toggleJobs()
   SetNuiFocus(true, true)
   SendNUIMessage({ action = "OPEN" })
-  local JobList = lib.callback.await('vhs-multijob:getJobs', false)
-  if JobList then
-      local jobs = format(JobList)
-      SendNUIMessage({ action = "UPDATE_STATS", module = "jobs", data = jobs })
+  local list = lib.callback.await('vhs-multijob:getJobs', false)
+  
+  if list then
+      local fJobs = fJob(list)
+      SendNUIMessage({ action = "UPDATE_STATS", module = "jobs", data = fJobs })
   else
+      print("Failed to fetch jobs.")
   end
 end
 
 closeJobs = function()
   SetNuiFocus(false, false)
-  SendNUIMessage({
-      event = "UI_STATE",
-      action = "CLOSE",
-  })
+  SendNUIMessage({ event = "UI_STATE", action = "CLOSE" })
 end
-
-RegisterCommand("toggleFob", function()
-  if isUIOpen then
-    closeJobs()
-  else
-    openJobs()
-  end
-end, false)
 
 RegisterNUICallback('LOSE_FOCUS', function(data, cb)
   SetNuiFocus(false, false)
   cb('ok')
 end)
 
-RegisterKeyMapping("toggleFob", "Toggle Fob", "keyboard", menuOptions.openUI)
+RegisterCommand("toggleJobs", function()
+  if isUIOpen then
+      closeJobs()
+  else
+    toggleJobs()
+  end
+end, false)
+
+RegisterKeyMapping("toggleJobs", "Opens Multi-JobS", "keyboard", menuOptions.openUI)
+
+RegisterCommand("closeJobs", function(source, args, rawCommand)
+  closeJobs()
+end, false)

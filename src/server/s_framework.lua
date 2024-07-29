@@ -1,3 +1,4 @@
+
 function setJob(job, grade)
     if Framework == 'esx' then
         local player = ESX.GetPlayerFromId(source)
@@ -10,6 +11,7 @@ function setJob(job, grade)
     end
 end
 
+
 function GetIdentifier(source)
     if Framework == 'esx' then 
         local player = ESX.GetPlayerFromId(source)
@@ -21,9 +23,10 @@ function GetIdentifier(source)
         if player then 
             return player.PlayerData.citizenid 
         end 
+    else 
+        print('no framework selected')
     end 
     return nil 
 end 
-
 
 
