@@ -2,10 +2,43 @@
 if Framework == 'esx' then ESX = exports["es_extended"]:getSharedObject() else QBCore = exports['qb-core']:GetCoreObject() end
 
 
+
+
+function setJob(job, grade)
+    if Framework == 'esx' then
+        local xPlayer = ESX.GetPlayerFromId(source)
+        if ESX.DoesJobExist(job, grade) then 
+            xPlayer.setJob(job, grade)
+        end
+    elseif Framework == 'qbcore' then
+        local xPlayer = QBCore.Functions.GetPlayer(source)
+        xPlayer.Functions.SetJob(job, grade)
+    end
+end
+
+function GetIdentifier(source)
+    if Framework == 'esx' then 
+        local xPlayer = ESX.GetPlayerFromId(source)
+        if xPlayer then 
+            return xPlayer.getIdentifier()
+        end 
+    elseif Framework == 'qbcore' then 
+        local xPlayer = QBCore.Functions.GetPlayer(source)
+        if xPlayer then 
+            return xPlayer.PlayerData.citizenid 
+        end 
+    end 
+    return nil 
+end 
+
+
+
+
 lib.callback.register('vhs-multijob:updateJobs', function(source, newJob, jobGrade, gradeLabel)
     local identifier = GetIdentifier(source)
 
     if not allowedJobs[newJob] then
+        print("Job not allowed: " .. newJob)
         return false
     end
 
@@ -16,6 +49,7 @@ lib.callback.register('vhs-multijob:updateJobs', function(source, newJob, jobGra
     end
 
     if #jobList >= menuOptions.maxJobs then
+       --  print("Job limit reached for identifier: " .. identifier)
         return false
     end
 
@@ -29,9 +63,17 @@ lib.callback.register('vhs-multijob:updateJobs', function(source, newJob, jobGra
 
     if not jobExists then
         table.insert(jobList, { name = newJob, grade = jobGrade, label = gradeLabel })
+    else
+        -- print("Job already exists: " .. newJob)
     end
-    
+
     local success = MySQL.update.await('REPLACE INTO vhs_multijob (identifier, jobs) VALUES (?, ?)', { identifier, json.encode(jobList) })
+
+    if success then
+       -- print("Job list updated for identifier: " .. identifier)
+    else
+        --print("Failed to update jobs for identifier: " .. identifier)
+    end
     return success
 end)
 
@@ -74,10 +116,13 @@ lib.callback.register('vhs-multijob:removeJob', function(source, jobName)
             end
             MySQL.Async.execute('UPDATE vhs_multijob SET jobs = @jobs WHERE identifier = @identifier', { ['@jobs'] = json.encode(updatedJobs), ['@identifier'] = identifier }, function(affectedRows)
                 if affectedRows > 0 then
-                        else
-                    end
-                end)
-            else
+                   -- print('Job removed successfully.')
+                else
+                   -- print('Failed to remove the job.')
+                end
+            end)
+        else
+           -- print('No jobs found for this identifier.')
         end
     end)
 end)

@@ -9,6 +9,11 @@ if Framework == 'esx' then
     AddEventHandler('esx:setJob', function(job)
         ESX.PlayerData.job = job
         local success = lib.callback.await('vhs-multijob:updateJobs', false, job.name, job.grade, job.grade_label)
+        if success then
+           -- print("Job updated successfully.")
+        else
+            print("Failed to update job.")
+        end
     end)
 end
 
@@ -21,9 +26,16 @@ if Framework == 'qbcore' then
     RegisterNetEvent('QBCore:Client:OnJobUpdate', function(JobInfo)
         PlayerData.job = JobInfo
         local success = lib.callback.await('vhs-multijob:updateJobs', false, JobInfo.name, JobInfo.grade.level, JobInfo.grade.name)
+        if success then
+           -- print("Job updated successfully.")
+        else
+           -- print("Failed to update job.")
         end
     end)
 end
+
+
+
 
 RegisterNUICallback('setjob', function(data, cb)
     local setjob = lib.callback.await('vhs-multijob:setJob', false, data.jobName, data.jobGrade)
@@ -31,4 +43,9 @@ end)
 
 RegisterNUICallback('deleteJob', function(data, cb)
     local success = lib.callback.await('vhs-multijob:removeJob', false, data.jobName)
+    if success then
+        cb('ok')
+    else
+        cb('error')
+    end
 end)

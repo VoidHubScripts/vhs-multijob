@@ -1,9 +1,5 @@
 
-if Framework == 'esx' then
-    ESX = exports["es_extended"]:getSharedObject()
-else
-    QBCore = exports['qb-core']:GetCoreObject()
-end
+if Framework == 'esx' then ESX = exports["es_extended"]:getSharedObject() else QBCore = exports['qb-core']:GetCoreObject() end
 
 
 Notify = function(type, title, text, targetClient)
@@ -17,19 +13,9 @@ Notify = function(type, title, text, targetClient)
 
     if Notifications == "ox_lib" then
         if IsDuplicityVersion() then
-            TriggerClientEvent('ox_lib:notify', targetClient, {
-                type = types[type], 
-                title = title,
-                position = 'center-right',
-                description = text,
-            })
+            TriggerClientEvent('ox_lib:notify', targetClient, { type = types[type], title = title, position = 'center-right', description = text })
         else 
-            lib.notify({
-                title = title,
-                description = text,
-                position = 'center-right',
-                type = types[type]
-            })
+            lib.notify({ title = title, description = text, position = 'center-right', type = types[type] })
         end 
     elseif Notifications == "esx" then
         if IsDuplicityVersion() then
@@ -52,42 +38,4 @@ Notify = function(type, title, text, targetClient)
         -- Default notification handling
     end
 end
-ProgressBar = function(duration, label)
-    if Progress == "ox_lib_circle" then
-        lib.progressCircle({
-            duration = duration,
-            label = label,
-            position = 'bottom',
-            useWhileDead = false,
-            canCancel = false,
-            allowSwimming = true, 
-            disable = {
-                move = true,
-                car = false,
-                combat = true,
-            },
-        })
-    elseif Progress == "ox_lib_bar" then
-        lib.progressBar({
-            duration = duration,
-            label = label,
-            useWhileDead = false,
-            canCancel = false,
-            disable = {
-                move = true,
-                car = true,
-                combat = true,
-            },
-        })
-    elseif Progress == "qbcore" then
-        QBCore.Functions.Progressbar(label, label, duration, false, false, {
-            disableMovement = true,
-            disableCarMovement = false,
-            disableMouse = false,
-            disableCombat = true,
-        }, {}, {}, {}, function() end)
-        Wait(duration)
-    elseif Progress == "custom" then
-        exports['progressBars']:startUI(duration, label)
-    end
-end
+
