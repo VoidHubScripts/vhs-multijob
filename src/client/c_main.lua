@@ -1,5 +1,7 @@
 if Framework == 'esx' then ESX = exports["es_extended"]:getSharedObject() else QBCore = exports['qb-core']:GetCoreObject() end
 
+local cooldowns = {}
+
 if Framework == 'esx' then
     RegisterNetEvent('esx:playerLoaded')
     AddEventHandler('esx:playerLoaded', function(xPlayer, isNew, skin)
@@ -35,17 +37,17 @@ if Framework == 'qbcore' then
 end
 
 
-
-
 RegisterNUICallback('setjob', function(data, cb)
-    local setjob = lib.callback.await('vhs-multijob:setJob', false, data.jobName, data.jobGrade)
+    local playerId = GetPlayerServerId(PlayerId())
+    if cooldowns[playerId] and (GetGameTimer() - cooldowns[playerId]) < (menuOptions.cooldownTime * 1000) then
+        Notify("error", "Slow Down", "Please wait before trying again.")
+        return
+    end
+    local setjob = lib.callback.await('vhs-multijob:setJob', false, data.jobName, data.jobGrade, data.joblabel)
+    cooldowns[playerId] = GetGameTimer()
 end)
 
 RegisterNUICallback('deleteJob', function(data, cb)
-    local success = lib.callback.await('vhs-multijob:removeJob', false, data.jobName)
-    if success then
-        cb('ok')
-    else
-        cb('error')
-    end
+    print(json.encode(data))
+    local success = lib.callback.await('vhs-multijob:removeJob', false, data.jobName, data.joblabel)
 end)

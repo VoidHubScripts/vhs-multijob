@@ -22,6 +22,7 @@ client_scripts {
 server_scripts {
   '@oxmysql/lib/MySQL.lua',
   'src/server/s_main.lua',
+  'config/sv_webhook.lua'
 }
  
 shared_scripts {

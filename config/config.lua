@@ -7,7 +7,8 @@ Notifications = 'ox_lib'  -- qbcore, esx, ox_lib
 
 menuOptions = { 
   openUI = 'O', 
-  maxJobs = 3
+  maxJobs = 3,
+  cooldownTime = 3 -- seconds  
 }
 
 allowedJobs = {
